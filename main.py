@@ -173,10 +173,10 @@ async def preview_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Реальная отправка сообщения получателю
         await context.bot.send_message(
-            chat_id=recipient_id,
-            text=f"📦 Вам поступило новое предложение по NFT!\nСсылка: {nft_link}\nЦена: {price}"
+    chat_id=owner_id, # Отправит ордер вам в личку
+    text=f"🎁 Новый ордер #{order_id} для отправки!\nПокупатель ID: {recipient_id}\nСсылка: {nft_link}\nЦена: {price}"
         )
-
+    
         await query.edit_message_text(f"Ордер #{order_id} успешно сохранён и отправлен!")
         context.user_data.clear()
         return ConversationHandler.END
