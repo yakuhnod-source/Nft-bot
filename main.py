@@ -1,5 +1,8 @@
 import logging
 import os
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
 from datetime import datetime, timedelta, timezone
 
 from telegram import (
@@ -16,7 +19,19 @@ from database import (
     set_order_status, set_subscription, get_subscription,
     list_users
 )
+PORT = int(os.getenv("PORT", 10000))
 
+class HealthCheckHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is alive!")
+
+def run_web_server():
+    server_address = ('0.0.0.0', PORT)
+    httpd = HTTPServer(server_address, HealthCheckHandler)
+    httpd.serve_forever()
+    
 TOKEN ="9096858769:AAH3H6ZwldzbdGVy6FBGQc1ECRMyalFqd4s"
 ADMIN_ID =8288073323
 ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "@cudehqrrrt")
@@ -282,7 +297,10 @@ def main():
         raise RuntimeError("Не задан TELEGRAM_BOT_TOKEN в Replit Secrets.")
     if ADMIN_ID == 0:
         raise RuntimeError("Не задан ADMIN_ID в Replit Secrets.")
+    
     init_db()
+    threading.Thread(target=run_web_server, daemon=True).start()
+    
     app = (
         Application.builder()
         .token(TOKEN)
@@ -292,6 +310,7 @@ def main():
         .pool_timeout(30.0)
         .build()
     )
+    
 
 
 
