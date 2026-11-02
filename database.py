@@ -11,7 +11,8 @@ def init_db():
     conn.commit()
     conn.close()
 
-def upsert_user(user_id):
+def upsert_user(user_id, username=""):
+    
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     cursor.execute('''
