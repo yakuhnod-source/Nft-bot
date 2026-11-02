@@ -1,39 +1,58 @@
-import os
-import logging
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-from database import init_db, upsert_user
+import sqlite3
 
-# Настройка логирования
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
+def init_db():
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            user_id INTEGER PRIMARY KEY
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+def upsert_user(user_id):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT OR IGNORE INTO users (user_id) VALUES (?)
+    ''', (user_id,))
+    conn.commit()
+    conn.close()
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    # Регистрируем пользователя в базе
-    upsert_user(user_id)
-    await update.message.reply_text("Привет! Бот успешно запущен и работает 24/7 на Render. 🚀")
+def create_order(*args, **kwargs):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    conn.commit()
+    conn.close()
 
-def main():
-    # Инициализируем базу данных (создаем таблицы при первом запуске)
-    init_db()
+def get_order(*args, **kwargs):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    conn.close()
+    return None
 
-    if not TOKEN:
-        logging.error("Не найден TELEGRAM_BOT_TOKEN в переменных окружения!")
-        return
+def set_order_status(*args, **kwargs):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    conn.commit()
+    conn.close()
 
-    # Запуск бота
-    app = ApplicationBuilder().token(TOKEN).build()
-    
-    app.add_handler(CommandHandler("start", start))
-    
-    logging.info("Бот запущен и ожидает сообщения...")
-    app.run_polling()
+def set_subscription(*args, **kwargs):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    conn.commit()
+    conn.close()
 
-if __name__ == '__main__':
-    main()
+def get_subscription(*args, **kwargs):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    conn.close()
+    return None
+
+def list_users(*args, **kwargs):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    conn.close()
+    return []
     
