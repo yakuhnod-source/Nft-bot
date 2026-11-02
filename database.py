@@ -43,6 +43,10 @@ def set_subscription(*args, **kwargs):
     cursor = conn.cursor()
     conn.commit()
     conn.close()
+
+def get_subscription(*args, **kwargs):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    conn.close()
+    return None
     
-    
-  
