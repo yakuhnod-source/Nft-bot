@@ -37,7 +37,12 @@ def set_order_status(*args, **kwargs):
     cursor = conn.cursor()
     conn.commit()
     conn.close()
-    
+
+def set_subscription(*args, **kwargs):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    conn.commit()
+    conn.close()
     
     
   
