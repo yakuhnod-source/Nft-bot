@@ -49,4 +49,10 @@ def get_subscription(*args, **kwargs):
     cursor = conn.cursor()
     conn.close()
     return None
+
+def list_users(*args, **kwargs):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    conn.close()
+    return []
     
