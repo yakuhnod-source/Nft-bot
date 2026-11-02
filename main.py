@@ -121,7 +121,9 @@ async def get_recipient(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def get_nft(update: Update, context: ContextTypes.DEFAULT_TYPE):
     link = update.message.text.strip()
-    if not (link.startswith("https://") and len(link) < 1000):
+    if not ("t.me/" in link or "http" in link) or len(link) >= 1000:
+        
+        
         await update.message.reply_text("Нужна корректная HTTPS-ссылка. Попробуйте ещё раз:")
         return NFT_LINK
     context.user_data["nft_link"] = link
