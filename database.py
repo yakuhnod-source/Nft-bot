@@ -31,6 +31,13 @@ def get_order(*args, **kwargs):
     cursor = conn.cursor()
     conn.close()
     return None
+
+def set_order_status(*args, **kwargs):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    conn.commit()
+    conn.close()
+    
     
     
   
