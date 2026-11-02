@@ -19,5 +19,14 @@ def upsert_user(user_id):
     ''', (user_id,))
     conn.commit()
     conn.close()
+
+def create_order(*args, **kwargs):
+    # Функция для создания заказа (если аргументы специфичны, можно дополнить)
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    # Базовая заглушка, чтобы бот не падал при импорте
+    conn.commit()
+    conn.close()
+    
     
   
