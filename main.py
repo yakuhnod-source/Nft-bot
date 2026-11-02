@@ -171,16 +171,51 @@ async def preview_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         order_id = create_order(owner_id, recipient_id, nft_link, price)
 
-        # Реальная отправка сообщения получателю
-        await context.bot.send_message(
-    chat_id=owner_id, # Отправит ордер вам в личку
-    text=f"🎁 Новый ордер #{order_id} для отправки!\nПокупатель ID: {recipient_id}\nСсылка: {nft_link}\nЦена: {price}"
-        )
-    
-        await query.edit_message_text(f"Ордер #{order_id} успешно сохранён и отправлен!")
-        context.user_data.clear()
-        return ConversationHandler.END
+            # Создаем кнопки для продавца: Принять / Отклонить
+    seller_keyboard = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("✅ Принять", callback_data=f"accept_{order_id}"),
+            InlineKeyboardButton("❌ Отклонить", callback_data=f"decline_{order_id}")
+        ]
+    ])
 
+    # Отправляем продавцу карточку с кнопками
+    await context.bot.send_message(
+        chat_id=owner_id,
+        text=f"🎁 Новый ордер #{order_id}!\n\n"
+             f"👤 Покупатель ID: {recipient_id}\n"
+             f"🔗 Ссылка на NFT: {nft_link}\n"
+             f"💰 Цена: {price} Stars\n\n"
+             f"Нажмите «Принять», чтобы подтвердить сделку.",
+        reply_markup=seller_keyboard
+    )
+
+    await query.edit_message_text(f"Ордер #{order_id} успешно создан и отправлен продавцу!")
+    context.user_data.clear()
+    return ConversationHandler.END
+    
+async def seller_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    
+    data = query.data
+    if data.startswith("accept_"):
+        order_id = data.split("_")[1]
+        
+        # Замените 'ваш_юзернейм' на ваш реальный ник в Telegram без знака @
+        transfer_keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🎁 Передать NFT", url="https://t.me/cudehqrrrt")]
+        ])
+        
+        await query.edit_message_text(
+            text=f"✅ Ордер #{order_id} принят!\nНажмите кнопку ниже, чтобы перейти к передаче NFT.",
+            reply_markup=transfer_keyword
+        )
+        
+    elif data.startswith("decline_"):
+        order_id = data.split("_")[1]
+        await query.edit_message_text(text=f"❌ Ордер #{order_id} отклонен.")
+        
 
 
 
@@ -334,6 +369,7 @@ def main():
     app.add_handler(CommandHandler("users", users_cmd))
     app.add_handler(order_flow)
     app.add_handler(CallbackQueryHandler(buy_choice, pattern="^buy_(week|month|forever)$"))
+    app.add_handler(CallbackQueryHandler(seller_action, pattern="^(accept_|decline_)"))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_router))
     log.info("Bot polling started.")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
